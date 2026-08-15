@@ -126,6 +126,9 @@ class WeddingApp {
     document.getElementById('target-guest-info').innerText = `${guestName} ➔ ${tableName}`;
     document.getElementById('target-seat-info').innerText = `Dein Sitzplatz ist Nummer ${guest.seat}`;
 
+    // NEU: Scrollt automatisch sanft zur Karte hinunter
+    document.getElementById('map-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
     this.focusTable(table);
     this.animationEngine.triggerConfetti();
     speakGreeting(guest.firstName, table.name, guest.seat);
