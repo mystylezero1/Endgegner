@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- NEU: Panzoom Bibliothek für Touch-Gesten -->
+  <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom/dist/panzoom.min.js"></script>
 </head>
 <body>
 
@@ -40,13 +42,15 @@
           <p id="target-seat-info" class="sub-info">Wähle oben deinen Namen aus.</p>
         </div>
         <div class="map-actions-top">
+          <!-- NEU: Übersicht & Toiletten Buttons -->
+          <button id="reset-zoom-btn" class="btn-speech hidden">🔍 Übersicht</button>
+          <button id="toilet-btn" class="btn-creme">🚻 Toiletten</button>
           <button id="speech-btn" class="btn-speech">🔊 Spruch</button>
         </div>
       </div>
 
       <div id="map-viewport" class="map-viewport">
         <div id="map-container" class="map-container">
-          <!-- Hier ist der angepasste Pfad: assets/saalplan.png -->
           <img src="assets/saalplan.png" id="map-image" alt="Saalplan Grundriss" />
           <div id="tables-layer" class="tables-layer"></div>
         </div>
