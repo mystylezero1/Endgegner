@@ -55,7 +55,7 @@ class WeddingApp {
     this.panzoom = Panzoom(mapContainer, {
       maxScale: 4,
       minScale: 1,
-      contain: 'outside',
+      // 'contain' wurde entfernt, damit das Skript nicht beim Zoomen an Rändern blockiert
       step: 0.3
     });
 
@@ -136,15 +136,15 @@ class WeddingApp {
     const container = document.getElementById('map-container');
     const scale = 1.7;
 
-    const cw = container.clientWidth;
-    const ch = container.clientHeight;
+    const cw = container.clientWidth || container.offsetWidth;
+    const ch = container.clientHeight || container.offsetHeight;
+    
     const panX = (cw * ((50 - table.x) / 100));
     const panY = (ch * ((50 - table.y) / 100));
 
+    // Beide Befehle nacheinander triggern flüssige Simultan-Animation
     this.panzoom.zoom(scale, { animate: true });
-    setTimeout(() => {
-      this.panzoom.pan(panX, panY, { animate: true });
-    }, 10);
+    this.panzoom.pan(panX, panY, { animate: true });
 
     document.getElementById('reset-zoom-btn').classList.remove('hidden');
 
