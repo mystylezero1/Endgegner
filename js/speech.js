@@ -10,6 +10,14 @@ export function speakGreeting(name, table, seat) {
     utterance.rate = 0.9;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
+    
+    // Für iOS: Trigger mit user interaction
+    if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+      utterance.onend = () => {
+        console.log('Begrüßung abgespielt');
+      };
+    }
+    
     window.speechSynthesis.speak(utterance);
   } else {
     console.error('Web Speech API wird nicht unterstützt');
@@ -18,31 +26,22 @@ export function speakGreeting(name, table, seat) {
 
 export function getRandomSpeech() {
   const speeches = [
-    {
-      text: "Auf eine unvergessliche Hochzeitsfeier!",
-      file: "Auf eine unvergessliche Hochzeitsfeier!.mp3"
-    },
-    {
-      text: "Ein Hoch auf die Liebe und auf euch alle!",
-      file: "Ein Hoch auf die Liebe und auf euch alle!.mp3"
-    },
-    {
-      text: "Lasst uns zusammen lachen, tanzen und feiern!",
-      file: "Lasst uns zusammen lachen, tanzen und feiern!.mp3"
-    },
-    {
-      text: "Schön, dass du unseren besonderen Tag mit uns feierst!",
-      file: "Schön, dass du unseren besonderen Tag mit uns feierst!.mp3"
-    }
+    "Auf eine unvergessliche Hochzeitsfeier!.mp3",
+    "Ein Hoch auf die Liebe und auf euch alle!.mp3",
+    "Lasst uns zusammen lachen, tanzen und feiern!.mp3",
+    "Schön, dass du unseren besonderen Tag mit uns feierst!.mp3"
   ];
   
-  const randomSpeech = speeches[Math.floor(Math.random() * speeches.length)];
+  const randomFile = speeches[Math.floor(Math.random() * speeches.length)];
+  const audioPath = `assets/${randomFile}`;
   
   // Spiele die MP3-Datei ab
-  const audio = new Audio(`assets/${randomSpeech.file}`);
+  const audio = new Audio(audioPath);
+  audio.volume = 1.0;
   audio.play().catch(err => {
     console.error('Audio konnte nicht abgespielt werden:', err);
   });
   
-  return randomSpeech.text;
+  // Gib den Text zurück für die Alert-Box
+  return randomFile.replace('.mp3', '');
 }
