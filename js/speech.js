@@ -5,30 +5,32 @@ export function speakGreeting(name, table, seat) {
   window.speechSynthesis.cancel();
   
   const displayTable = table === 'Braut-Tisch' ? 'dem Braut-Tisch' : `Tisch ${table.replace('Tisch ', '')}`;
-  const text = `Hallo ${name}! Dein Platz ist an ${displayTable}. Wir freuen uns sehr, dass du da bist!`;
+  
+  // NEU: Ein unsichtbares Komma zwingt die Stimme zum "Luftholen" und macht es natürlicher
+  const text = `Hallo ${name}! Dein Platz, ist an ${displayTable}. Wir freuen uns sehr, dass du da bist!`;
   
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = 'de-DE';
-  utterance.rate = 0.90; 
-  utterance.pitch = 1.0; 
+  utterance.rate = 0.95; // Minimal schneller als vorher, damit es nicht "betrunken" klingt
+  utterance.pitch = 1.05; // Minimal höher für eine freundlichere Klangfarbe
 
-  // Wir versuchen sofort eine deutsche Stimme zu greifen
   const voices = window.speechSynthesis.getVoices();
   
   if (voices.length > 0) {
-    const premiumVoice = voices.find(v => v.lang.startsWith('de') && (v.name.includes('Natural') || v.name.includes('Online'))) ||
-                         voices.find(v => v.lang.startsWith('de') && (v.name.includes('Google') || v.name.includes('Siri') || v.name.includes('Katja'))) ||
-                         voices.find(v => v.lang.startsWith('de') && v.localService === false) ||
-                         voices.find(v => v.lang.startsWith('de'));
+    // NEU: Wir suchen gezielt nach den natürlichsten Systemstimmen
+    const bestVoice = voices.find(v => v.lang.startsWith('de') && (v.name.includes('Siri') || v.name.includes('Helena') || v.name.includes('Marlene') || v.name.includes('Anna'))) || // iOS Favoriten
+                      voices.find(v => v.lang.startsWith('de') && v.name.includes('Google') && v.name.includes('Online')) || // Android Online-Stimmen (viel natürlicher)
+                      voices.find(v => v.lang.startsWith('de') && v.name.includes('Google')) || // Android Standard
+                      voices.find(v => v.lang.startsWith('de') && v.name.includes('Katja')) || // Windows
+                      voices.find(v => v.lang.startsWith('de') && v.localService === false) ||
+                      voices.find(v => v.lang.startsWith('de'));
 
-    if (premiumVoice) {
-      utterance.voice = premiumVoice;
+    if (bestVoice) {
+      utterance.voice = bestVoice;
     }
   }
 
-  // WICHTIG FÜR APPLE: Der speak()-Befehl MUSS sofort ausgeführt werden.
-  // Jegliches Warten (z.B. auf onvoiceschanged) führt unter iOS dazu,
-  // dass Safari die Ausgabe blockiert, da die direkte Klick-Interaktion abläuft!
+  // WICHTIG FÜR APPLE: Sofort ausführen!
   window.speechSynthesis.speak(utterance);
 }
 
@@ -36,7 +38,8 @@ export function getRandomSpeech() {
   const speeches = [
     "Schön, dass du unseren besonderen Tag mit uns feierst!",
     "Lasst uns zusammen lachen, tanzen und feiern!",
-    "Ein Hoch auf die Liebe und auf euch alle!",
+    // NEU: Kommas für natürlichere Betonung beim Vorlesen
+    "Ein Hoch auf die Liebe, und auf euch alle!",
     "Auf eine unvergessliche Hochzeitsfeier!"
   ];
   return speeches[Math.floor(Math.random() * speeches.length)];
