@@ -55,7 +55,6 @@ class WeddingApp {
     this.panzoom = Panzoom(mapContainer, {
       maxScale: 4,
       minScale: 1,
-      // 'contain' wurde entfernt, damit das Skript nicht beim Zoomen an Rändern blockiert
       step: 0.3
     });
 
@@ -107,11 +106,11 @@ class WeddingApp {
       showToilets = !showToilets;
       if (showToilets) {
         mapImage.src = 'assets/saalplan_toiletten.png'; 
-        e.target.innerText = '🗺️ Saalplan';
+        e.target.innerText = '🗺️ Plan';
         e.target.classList.replace('btn-creme', 'btn-gold');
       } else {
         mapImage.src = 'assets/saalplan.png';
-        e.target.innerText = '🚻 Toiletten';
+        e.target.innerText = '🚻 WC';
         e.target.classList.replace('btn-gold', 'btn-creme');
       }
     });
@@ -142,7 +141,6 @@ class WeddingApp {
     const panX = (cw * ((50 - table.x) / 100));
     const panY = (ch * ((50 - table.y) / 100));
 
-    // Beide Befehle nacheinander triggern flüssige Simultan-Animation
     this.panzoom.zoom(scale, { animate: true });
     this.panzoom.pan(panX, panY, { animate: true });
 
