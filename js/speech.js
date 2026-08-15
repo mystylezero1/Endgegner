@@ -4,10 +4,9 @@ export function speakGreeting(name, table, seat) {
   
   // ResponsiveVoice Text-to-Speech
   if (typeof responsiveVoice !== 'undefined') {
+    responsiveVoice.cancel();
     responsiveVoice.speak(text, 'German Female', {
       rate: 0.9,
-      pitch: 1.0,
-      volume: 1.0,
     });
   } else {
     console.error('ResponsiveVoice ist nicht geladen');
@@ -26,10 +25,9 @@ export function getRandomSpeech() {
   
   // ResponsiveVoice Text-to-Speech
   if (typeof responsiveVoice !== 'undefined') {
+    responsiveVoice.cancel();
     responsiveVoice.speak(text, 'German Female', {
       rate: 0.9,
-      pitch: 1.0,
-      volume: 1.0,
     });
   } else {
     console.error('ResponsiveVoice ist nicht geladen');
