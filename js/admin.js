@@ -11,9 +11,10 @@ export class AdminModule {
   init() {
     const urlParams = new URLSearchParams(window.location.search);
     const isAdminUrl = urlParams.get(CONFIG.adminUrlParam) === CONFIG.adminUrlValue;
+    const isDesktop = window.innerWidth > 1024; // Nur auf Desktops
 
     const adminTriggerBtn = document.getElementById('admin-trigger-btn');
-    if (isAdminUrl && adminTriggerBtn) {
+    if (isAdminUrl && isDesktop && adminTriggerBtn) {
       adminTriggerBtn.classList.remove('hidden');
     }
 
