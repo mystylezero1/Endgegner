@@ -1,6 +1,7 @@
 export function speakGreeting(name, table, seat) {
   if (!('speechSynthesis' in window)) return;
   
+  // Laufende Sprachausgabe abbrechen
   window.speechSynthesis.cancel();
   
   const displayTable = table === 'Braut-Tisch' ? 'dem Braut-Tisch' : `Tisch ${table.replace('Tisch ', '')}`;
@@ -11,9 +12,10 @@ export function speakGreeting(name, table, seat) {
   utterance.rate = 0.90; 
   utterance.pitch = 1.0; 
 
-  const playSpeech = () => {
-    const voices = window.speechSynthesis.getVoices();
-    
+  // Wir versuchen sofort eine deutsche Stimme zu greifen
+  const voices = window.speechSynthesis.getVoices();
+  
+  if (voices.length > 0) {
     const premiumVoice = voices.find(v => v.lang.startsWith('de') && (v.name.includes('Natural') || v.name.includes('Online'))) ||
                          voices.find(v => v.lang.startsWith('de') && (v.name.includes('Google') || v.name.includes('Siri') || v.name.includes('Katja'))) ||
                          voices.find(v => v.lang.startsWith('de') && v.localService === false) ||
@@ -22,18 +24,12 @@ export function speakGreeting(name, table, seat) {
     if (premiumVoice) {
       utterance.voice = premiumVoice;
     }
-
-    window.speechSynthesis.speak(utterance);
-  };
-
-  let voices = window.speechSynthesis.getVoices();
-  if (voices.length === 0) {
-    window.speechSynthesis.onvoiceschanged = () => {
-      playSpeech();
-    };
-  } else {
-    playSpeech();
   }
+
+  // WICHTIG FÜR APPLE: Der speak()-Befehl MUSS sofort ausgeführt werden.
+  // Jegliches Warten (z.B. auf onvoiceschanged) führt unter iOS dazu,
+  // dass Safari die Ausgabe blockiert, da die direkte Klick-Interaktion abläuft!
+  window.speechSynthesis.speak(utterance);
 }
 
 export function getRandomSpeech() {
