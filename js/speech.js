@@ -2,11 +2,16 @@ export function speakGreeting(name, table, seat) {
   const displayTable = table === 'Braut-Tisch' ? 'dem Brauttisch' : `Tisch Nummer ${table.replace('Tisch ', '')}`;
   const text = `Hallo ${name}! Du sitzt an ${displayTable}. Wir freuen uns sehr, dass du da bist!`;
   
-  // Google Translate Text-to-Speech API (kostenlos)
-  const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=de&client=tw-ob`;
-  
-  const audio = new Audio(audioUrl);
-  audio.play().catch(err => console.error('Audio konnte nicht abgespielt werden:', err));
+  // ResponsiveVoice Text-to-Speech
+  if (typeof responsiveVoice !== 'undefined') {
+    responsiveVoice.speak(text, 'German Female', {
+      rate: 0.9,
+      pitch: 1.0,
+      volume: 1.0,
+    });
+  } else {
+    console.error('ResponsiveVoice ist nicht geladen');
+  }
 }
 
 export function getRandomSpeech() {
@@ -19,11 +24,16 @@ export function getRandomSpeech() {
   
   const text = speeches[Math.floor(Math.random() * speeches.length)];
   
-  // Google Translate Text-to-Speech API (kostenlos)
-  const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=de&client=tw-ob`;
-  
-  const audio = new Audio(audioUrl);
-  audio.play().catch(err => console.error('Audio konnte nicht abgespielt werden:', err));
+  // ResponsiveVoice Text-to-Speech
+  if (typeof responsiveVoice !== 'undefined') {
+    responsiveVoice.speak(text, 'German Female', {
+      rate: 0.9,
+      pitch: 1.0,
+      volume: 1.0,
+    });
+  } else {
+    console.error('ResponsiveVoice ist nicht geladen');
+  }
   
   return text;
 }
