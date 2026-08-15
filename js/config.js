@@ -4,7 +4,7 @@ export const CONFIG = {
     bride: 'Anja',
     groom: 'Dino'
   },
-  photoAlbumUrl: 'https://photos.app.goo.gl/CT94iSBrYeMc4JQ4A',
+  photoAlbumUrl: 'https://app.mymillionsnaps.de/f71210da-70bf-4078-ab79-992de5e2316e/pictures',
   adminUrlParam: 'admin',
   adminUrlValue: 'true'
 };
