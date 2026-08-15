@@ -1,23 +1,12 @@
 export function speakGreeting(name, table, seat) {
-  if (!('speechSynthesis' in window)) return;
-  
-  window.speechSynthesis.cancel();
-  
   const displayTable = table === 'Braut-Tisch' ? 'dem Brauttisch' : `Tisch Nummer ${table.replace('Tisch ', '')}`;
   const text = `Hallo ${name}! Du sitzt an ${displayTable}. Wir freuen uns sehr, dass du da bist!`;
   
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'de-DE';
+  // Google Translate Text-to-Speech API (kostenlos)
+  const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=de&client=tw-ob`;
   
-  // WICHTIG: Exakt 1.0! Jede Abweichung verzerrt die iOS-Stimme massiv.
-  utterance.rate = 1.0; 
-  utterance.pitch = 1.0; 
-
-  // Wir verzichten komplett auf die manuelle Zuweisung einer Stimme (utterance.voice).
-  // Dadurch überlassen wir dem iPhone/Android die Wahl, und es nutzt 
-  // automatisch seine beste eingestellte Standard-Stimme für Deutsch.
-  
-  window.speechSynthesis.speak(utterance);
+  const audio = new Audio(audioUrl);
+  audio.play().catch(err => console.error('Audio konnte nicht abgespielt werden:', err));
 }
 
 export function getRandomSpeech() {
@@ -27,5 +16,14 @@ export function getRandomSpeech() {
     "Ein Hoch auf die Liebe und auf euch alle!",
     "Auf eine unvergessliche Hochzeitsfeier!"
   ];
-  return speeches[Math.floor(Math.random() * speeches.length)];
+  
+  const text = speeches[Math.floor(Math.random() * speeches.length)];
+  
+  // Google Translate Text-to-Speech API (kostenlos)
+  const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=de&client=tw-ob`;
+  
+  const audio = new Audio(audioUrl);
+  audio.play().catch(err => console.error('Audio konnte nicht abgespielt werden:', err));
+  
+  return text;
 }
