@@ -9,10 +9,10 @@ class WeddingApp {
     this.config = CONFIG;
     this.data = { tables: [], guests: [] };
     this.animationEngine = new AnimationEngine('animation-canvas');
+    this.panzoom = null;
     this.injectHighlightStyles();
   }
 
-  // Erzeugt das goldene Pulsieren für den gewählten Tisch
   injectHighlightStyles() {
     if (!document.getElementById('table-highlight-style')) {
       const style = document.createElement('style');
@@ -44,7 +44,22 @@ class WeddingApp {
     this.searchModule = new SearchModule(this.data.guests, (guest) => this.onGuestSelected(guest));
     this.adminModule = new AdminModule(this.data, () => this.onDataUpdated());
 
+    this.initPanzoom();
     this.setupEventListeners();
+  }
+
+  initPanzoom() {
+    const mapContainer = document.getElementById('map-container');
+    const viewport = document.getElementById('map-viewport');
+    
+    this.panzoom = Panzoom(mapContainer, {
+      maxScale: 4,
+      minScale: 1,
+      contain: 'outside',
+      step: 0.3
+    });
+
+    viewport.addEventListener('wheel', this.panzoom.zoomWithWheel);
   }
 
   applyConfig() {
@@ -80,6 +95,26 @@ class WeddingApp {
     document.getElementById('speech-btn')?.addEventListener('click', () => {
       alert(`💬 Brautpaar Spruch:\n\n"${getRandomSpeech()}"`);
     });
+
+    document.getElementById('reset-zoom-btn')?.addEventListener('click', (e) => {
+      this.panzoom.reset({ animate: true });
+      e.target.classList.add('hidden');
+    });
+
+    let showToilets = false;
+    const mapImage = document.getElementById('map-image');
+    document.getElementById('toilet-btn')?.addEventListener('click', (e) => {
+      showToilets = !showToilets;
+      if (showToilets) {
+        mapImage.src = 'assets/saalplan_toiletten.png'; 
+        e.target.innerText = '🗺️ Saalplan';
+        e.target.classList.replace('btn-creme', 'btn-gold');
+      } else {
+        mapImage.src = 'assets/saalplan.png';
+        e.target.innerText = '🚻 Toiletten';
+        e.target.classList.replace('btn-gold', 'btn-creme');
+      }
+    });
   }
 
   onGuestSelected(guest) {
@@ -98,29 +133,32 @@ class WeddingApp {
   }
 
   focusTable(table) {
-    // 1. Kamera-Zoom auf das Zentrum des Tisches
     const container = document.getElementById('map-container');
     const scale = 1.7;
-    const translateX = (50 - table.x) * (scale / 1.8);
-    const translateY = (50 - table.y) * (scale / 1.8);
 
-    container.style.transform = `scale(${scale}) translate(${translateX}%, ${translateY}%)`;
+    const cw = container.clientWidth;
+    const ch = container.clientHeight;
+    const panX = (cw * ((50 - table.x) / 100));
+    const panY = (ch * ((50 - table.y) / 100));
 
-    // 2. Erzeuge den exakten Rahmen
+    this.panzoom.zoom(scale, { animate: true });
+    setTimeout(() => {
+      this.panzoom.pan(panX, panY, { animate: true });
+    }, 10);
+
+    document.getElementById('reset-zoom-btn').classList.remove('hidden');
+
     const tablesLayer = document.getElementById('tables-layer');
     tablesLayer.innerHTML = '';
 
     const highlight = document.createElement('div');
     highlight.className = 'table-highlight';
 
-    // Automatischer Format-Wechsel: Brauttisch vs. Standard-Tische
     const isBrautTisch = table.id === 'brauttisch' || table.name.toLowerCase().includes('braut');
     
-    // Feinjustierte Maße in % für einen exakten Sitz
     const width = table.width || (isBrautTisch ? 62 : 13.2);
     const height = table.height || (isBrautTisch ? 16 : 15.3);
 
-    // Positionierung zentriert zum X/Y-Koordinatenpunkt des Tisches
     highlight.style.left = `${table.x - width / 2}%`;
     highlight.style.top = `${table.y - height / 2}%`;
     highlight.style.width = `${width}%`;
