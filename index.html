@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <!-- NEU: Panzoom Bibliothek für Touch-Gesten -->
   <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom/dist/panzoom.min.js"></script>
 </head>
 <body>
@@ -42,10 +41,11 @@
           <p id="target-seat-info" class="sub-info">Wähle oben deinen Namen aus.</p>
         </div>
         <div class="map-actions-top">
-          <!-- NEU: Übersicht & Toiletten Buttons -->
+          <!-- Alle 4 Buttons kompakt auf einer Linie -->
           <button id="reset-zoom-btn" class="btn-speech hidden">🔍 Übersicht</button>
-          <button id="toilet-btn" class="btn-creme">🚻 Toiletten</button>
+          <button id="toilet-btn" class="btn-creme">🚻 WC</button>
           <button id="speech-btn" class="btn-speech">🔊 Spruch</button>
+          <a id="photo-link" href="#" target="_blank" class="btn-gold">📷 Fotos</a>
         </div>
       </div>
 
@@ -54,10 +54,6 @@
           <img src="assets/saalplan.png" id="map-image" alt="Saalplan Grundriss" />
           <div id="tables-layer" class="tables-layer"></div>
         </div>
-      </div>
-
-      <div class="action-footer">
-        <a id="photo-link" href="#" target="_blank" class="btn-gold">📷 Hochzeitsfotos teilen</a>
       </div>
     </section>
   </main>
