@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hochzeits-Sitzplan Anja & Dino</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <canvas id="animation-canvas"></canvas>
+
+  <header class="header">
+    <div class="header-content">
+      <h1 id="app-title">Anja & Dino</h1>
+      <p id="app-subtitle">Herzlich willkommen zu unserer Hochzeit!</p>
+    </div>
+    <button id="admin-trigger-btn" class="btn-icon hidden" title="Admin Konsole">🔒</button>
+  </header>
+
+  <main class="main-container">
+    <section id="welcome-section" class="card">
+      <div class="welcome-text">
+        <h2>Finde deinen Sitzplatz</h2>
+        <p>Gib bitte deinen Vornamen ein, um deinen Tisch auf dem Saalplan zu entdecken.</p>
+      </div>
+      
+      <div class="search-box">
+        <input type="text" id="search-input" placeholder="Dein Vorname (z. B. Max)..." autocomplete="off">
+        <div id="search-results" class="results-dropdown"></div>
+      </div>
+    </section>
+
+    <section id="map-section" class="card map-card">
+      <div class="map-header">
+        <div class="guest-highlight-info">
+          <h3 id="target-guest-info">Saalplan & Tischübersicht</h3>
+          <p id="target-seat-info" class="sub-info">Wähle oben deinen Namen aus.</p>
+        </div>
+        <div class="map-actions-top">
+          <button id="speech-btn" class="btn-speech">🔊 Spruch</button>
+        </div>
+      </div>
+
+      <div id="map-viewport" class="map-viewport">
+        <div id="map-container" class="map-container">
+          <!-- Hier ist der angepasste Pfad: assets/saalplan.png -->
+          <img src="assets/saalplan.png" id="map-image" alt="Saalplan Grundriss" />
+          <div id="tables-layer" class="tables-layer"></div>
+        </div>
+      </div>
+
+      <div class="action-footer">
+        <a id="photo-link" href="#" target="_blank" class="btn-gold">📷 Hochzeitsfotos teilen</a>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="disambiguation-dialog" class="modal">
+    <h3>Mehrere Personen gefunden</h3>
+    <p>Bitte wähle deinen genauen Eintrag aus:</p>
+    <div id="disambiguation-list" class="modal-list"></div>
+    <button id="disambiguation-close-btn" class="btn-secondary" style="margin-top:1rem; width:100%;">Schließen</button>
+  </dialog>
+
+  <dialog id="admin-dialog" class="modal modal-large">
+    <div class="admin-header">
+      <h3>🔒 Admin Konsole (Anja & Dino)</h3>
+      <button id="admin-close-btn" class="btn-close">&times;</button>
+    </div>
+    
+    <div class="admin-body">
+      <div class="admin-tools-bar">
+        <label for="excel-import-file" class="btn-creme custom-file-upload">
+          📤 Excel Liste Hochladen (.xlsx)
+        </label>
+        <input type="file" id="excel-import-file" accept=".xlsx, .xls" style="display:none;">
+        <button id="json-export-btn" class="btn-gold">💾 Neue data.json herunterladen</button>
+        <button id="excel-export-btn" class="btn-creme">📥 Excel Backup (.xlsx)</button>
+      </div>
+
+      <div class="admin-stats" id="admin-stats">
+        <span>Gäste gesamt: <strong id="admin-guest-count">0</strong></span>
+      </div>
+
+      <div class="admin-guest-table-container">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Vorname</th>
+              <th>Initial</th>
+              <th>Tisch</th>
+              <th>Sitzplatz</th>
+              <th>Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="admin-guest-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
