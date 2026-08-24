@@ -193,6 +193,76 @@ class WeddingApp {
       this.config.features.darkMode = !this.config.features.darkMode;
       this.saveFeatureSettings();
     });
+
+    // Music Button
+    document.getElementById('music-btn')?.addEventListener('click', () => {
+      const musicDialog = document.getElementById('music-dialog');
+      if (musicDialog) {
+        musicDialog.showModal();
+        // Load saved Spotify URL
+        const savedUrl = localStorage.getItem('wedding_spotify_url');
+        if (savedUrl) {
+          document.getElementById('spotify-url-input').value = savedUrl;
+          document.getElementById('spotify-link').href = savedUrl;
+          document.getElementById('spotify-link-section').classList.remove('hidden');
+        }
+      }
+    });
+
+    // Save Spotify URL
+    document.getElementById('save-spotify-btn')?.addEventListener('click', () => {
+      const url = document.getElementById('spotify-url-input').value;
+      localStorage.setItem('wedding_spotify_url', url);
+      document.getElementById('spotify-link').href = url;
+      document.getElementById('spotify-link-section').classList.remove('hidden');
+      this.config.photoAlbumUrl = url; // Update config if needed
+    });
+
+    // Close Music Dialog
+    document.getElementById('music-close-btn')?.addEventListener('click', () => {
+      document.getElementById('music-dialog').close();
+    });
+
+    // Taxi Button
+    document.getElementById('taxi-btn')?.addEventListener('click', () => {
+      const taxiDialog = document.getElementById('taxi-dialog');
+      if (taxiDialog) {
+        taxiDialog.showModal();
+        this.loadTaxiCompanies();
+      }
+    });
+
+    // Close Taxi Dialog
+    document.getElementById('taxi-close-btn')?.addEventListener('click', () => {
+      document.getElementById('taxi-dialog').close();
+    });
+  }
+
+  loadTaxiCompanies() {
+    const taxiList = document.getElementById('taxi-list');
+    if (!taxiList) return;
+
+    // Taxi companies from original implementation
+    const taxiCompanies = [
+      { name: 'Taxi Tibljas', phone: '+499281794111' },
+      { name: 'Taxi 8088', phone: '+4992818088' },
+      { name: 'Taxi Frisch', phone: '+4992814866 oder +499281833010' },
+      { name: 'Taxi 3033 Hof', phone: '+4992813033' }
+    ];
+
+    taxiList.innerHTML = '';
+    taxiCompanies.forEach(company => {
+      const item = document.createElement('div');
+      item.className = 'disambiguation-btn';
+      item.innerHTML = `
+        <div>
+          <strong>${company.name}</strong><br>
+          <small>${company.phone}</small>
+        </div>
+        <a href="tel:${company.phone.split(' oder ')[0].replace(/\s/g, '')}" class="btn-gold" style="text-decoration:none; padding:0.3rem 0.6rem; font-size:0.8rem;">Anrufen</a>
+      `;
+      taxiList.appendChild(item);
+    });
   }
 
   onGuestSelected(guest) {
@@ -228,73 +298,3 @@ class WeddingApp {
 
     if (!this.config.features.guestNotes) {
       notesSection.classList.remove('active');
-      return;
-    }
-
-    const hasNotes = guest.notes || guest.dietary || guest.allergies;
-
-    if (!hasNotes) {
-      notesSection.classList.remove('active');
-      return;
-    }
-
-    notesContent.replaceChildren();
-
-    const addNote = (label, value) => {
-      const item = document.createElement('div');
-      item.className = 'note-item';
-      const labelEl = document.createElement('span');
-      labelEl.className = 'note-label';
-      labelEl.textContent = label;
-      item.appendChild(labelEl);
-      item.append(` ${value}`);
-      notesContent.appendChild(item);
-    };
-
-    if (guest.allergies) addNote('⚠️ Allergien:', guest.allergies);
-    if (guest.dietary) addNote('🍽️ Essenspräferenzen:', guest.dietary);
-    if (guest.notes) addNote('📝 Notizen:', guest.notes);
-
-    notesSection.classList.add('active');
-  }
-
-  focusTable(table) {
-    const container = document.getElementById('map-container');
-    const scale = 1.7;
-
-    const cw = container.clientWidth || container.offsetWidth;
-    const ch = container.clientHeight || container.offsetHeight;
-    
-    const panX = (cw * ((50 - table.x) / 100));
-    const panY = (ch * ((50 - table.y) / 100));
-
-    this.panzoom.zoom(scale, { animate: true });
-    this.panzoom.pan(panX, panY, { animate: true });
-
-    document.getElementById('reset-zoom-btn').classList.remove('hidden');
-
-    const tablesLayer = document.getElementById('tables-layer');
-    tablesLayer.innerHTML = '';
-
-    const highlight = document.createElement('div');
-    highlight.className = 'table-highlight';
-
-    const isBrautTisch = table.id === 'brauttisch' || table.name.toLowerCase().includes('braut');
-    
-    const width = table.width || (isBrautTisch ? 62 : 13.2);
-    const height = table.height || (isBrautTisch ? 16 : 15.3);
-
-    highlight.style.left = `${table.x - width / 2}%`;
-    highlight.style.top = `${table.y - height / 2}%`;
-    highlight.style.width = `${width}%`;
-    highlight.style.height = `${height}%`;
-    highlight.style.borderRadius = isBrautTisch ? '24px' : '8px';
-
-    tablesLayer.appendChild(highlight);
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const app = new WeddingApp();
-  app.init();
-});
