@@ -44,6 +44,22 @@ class WeddingApp {
     if (savedSettings) {
       this.config.features = { ...this.config.features, ...JSON.parse(savedSettings) };
     }
+    
+    // Spotify URL aus localStorage laden
+    const savedSpotifyUrl = localStorage.getItem('wedding_spotify_url');
+    if (savedSpotifyUrl) {
+      this.config.spotify.playlistUrl = savedSpotifyUrl;
+    }
+    
+    // Taxi Telefonnummern aus localStorage laden (nicht mehr nötig, wird direkt in config.js bearbeitet)
+    // Für Kompatibilität mit alten Daten aber noch vorhanden
+    const savedTaxiSingle = localStorage.getItem('wedding_taxi_single');
+    const savedTaxiGroup = localStorage.getItem('wedding_taxi_group');
+    if (savedTaxiSingle || savedTaxiGroup) {
+      // Alte Daten im localStorage ignorieren, da jetzt config.js verwendet wird
+      console.log('Alte Taxi-Daten im localStorage gefunden, werden ignoriert (config.js wird verwendet)');
+    }
+    
     this.applyFeatureSettings();
   }
 
@@ -64,6 +80,8 @@ class WeddingApp {
     const toiletBtn = document.getElementById('toilet-btn');
     const speechBtn = document.getElementById('speech-btn');
     const darkModeBtn = document.getElementById('dark-mode-btn');
+    const spotifyBtn = document.getElementById('spotify-link');
+    const taxiBtn = document.getElementById('taxi-btn');
 
     if (toiletBtn) {
       toiletBtn.style.display = this.config.features.toiletToggle ? 'inline-flex' : 'none';
@@ -72,9 +90,43 @@ class WeddingApp {
       speechBtn.style.display = this.config.features.speechGreeting ? 'inline-flex' : 'none';
     }
     if (darkModeBtn) {
-      darkModeBtn.style.display = 'inline-flex';
-      darkModeBtn.textContent = this.config.features.darkMode ? '☀️' : '🌙';
-      darkModeBtn.title = this.config.features.darkMode ? 'Hellmodus' : 'Dark Mode';
+      darkModeBtn.style.display = this.config.features.darkMode ? 'none' : 'inline-flex';
+    }
+    if (spotifyBtn) {
+      if (this.config.features.spotifyFeature) {
+        spotifyBtn.style.display = 'inline-flex';
+        spotifyBtn.classList.remove('hidden');
+        // Wenn keine URL gesetzt ist, Link deaktivieren
+        if (!this.config.spotify.playlistUrl) {
+          spotifyBtn.href = '#';
+          spotifyBtn.style.pointerEvents = 'none';
+          spotifyBtn.style.opacity = '0.5';
+        } else {
+          spotifyBtn.href = this.config.spotify.playlistUrl;
+          spotifyBtn.style.pointerEvents = 'auto';
+          spotifyBtn.style.opacity = '1';
+        }
+      } else {
+        spotifyBtn.style.display = 'none';
+        spotifyBtn.classList.add('hidden');
+      }
+    }
+    if (taxiBtn) {
+      if (this.config.features.taxiFeature) {
+        taxiBtn.style.display = 'inline-flex';
+        taxiBtn.classList.remove('hidden');
+        // Wenn keine Taxi-Unternehmen konfiguriert sind, Button deaktivieren
+        if (!this.config.taxi.companies || this.config.taxi.companies.length === 0) {
+          taxiBtn.style.pointerEvents = 'none';
+          taxiBtn.style.opacity = '0.5';
+        } else {
+          taxiBtn.style.pointerEvents = 'auto';
+          taxiBtn.style.opacity = '1';
+        }
+      } else {
+        taxiBtn.style.display = 'none';
+        taxiBtn.classList.add('hidden');
+      }
     }
   }
 
@@ -90,7 +142,7 @@ class WeddingApp {
     this.applyConfig();
     await this.loadData();
 
-    this.searchModule = new SearchModule(this.data.guests, this.data.tables, (guest) => this.onGuestSelected(guest));
+    this.searchModule = new SearchModule(this.data.guests, (guest) => this.onGuestSelected(guest));
     this.adminModule = new AdminModule(this.data, () => this.onDataUpdated(), this.config, this.deletedGuests);
 
     this.initPanzoom();
@@ -104,8 +156,7 @@ class WeddingApp {
     this.panzoom = Panzoom(mapContainer, {
       maxScale: 4,
       minScale: 1,
-      step: 0.3,
-      contain: 'outside'
+      step: 0.3
     });
 
     viewport.addEventListener('wheel', this.panzoom.zoomWithWheel);
@@ -114,6 +165,19 @@ class WeddingApp {
   applyConfig() {
     document.getElementById('app-title').innerText = `${this.config.names.bride} & ${this.config.names.groom}`;
     document.getElementById('photo-link').href = this.config.photoAlbumUrl;
+    
+    // Spotify Playlist URL setzen
+    const spotifyLink = document.getElementById('spotify-link');
+    if (spotifyLink && this.config.spotify.playlistUrl) {
+      spotifyLink.href = this.config.spotify.playlistUrl;
+    }
+    
+    // Taxi-Konfiguration validieren
+    if (!this.config.taxi.companies || !Array.isArray(this.config.taxi.companies)) {
+      console.warn('Taxi-Konfiguration fehlt oder ist ungültig');
+      this.config.taxi.companies = [];
+    }
+    
     this.applyFeatureSettings();
   }
 
@@ -194,72 +258,68 @@ class WeddingApp {
       this.saveFeatureSettings();
     });
 
-    // Music Button
-    document.getElementById('music-btn')?.addEventListener('click', () => {
-      const musicDialog = document.getElementById('music-dialog');
-      if (musicDialog) {
-        musicDialog.showModal();
-        const savedUrl = localStorage.getItem('wedding_spotify_url');
-        if (savedUrl) {
-          document.getElementById('spotify-url-input').value = savedUrl;
-          document.getElementById('spotify-link').href = savedUrl;
-          document.getElementById('spotify-link-section').classList.remove('hidden');
-        }
-      }
-    });
-
-    // Save Spotify URL
-    document.getElementById('save-spotify-btn')?.addEventListener('click', () => {
-      const url = document.getElementById('spotify-url-input').value;
-      localStorage.setItem('wedding_spotify_url', url);
-      document.getElementById('spotify-link').href = url;
-      document.getElementById('spotify-link-section').classList.remove('hidden');
-    });
-
-    // Close Music Dialog
-    document.getElementById('music-close-btn')?.addEventListener('click', () => {
-      document.getElementById('music-dialog').close();
-    });
-
-    // Taxi Button
+    // Taxi Button - Modal öffnen
     document.getElementById('taxi-btn')?.addEventListener('click', () => {
-      const taxiDialog = document.getElementById('taxi-dialog');
-      if (taxiDialog) {
-        taxiDialog.showModal();
-        this.loadTaxiCompanies();
-      }
+      if (!this.config.features.taxiFeature) return;
+      this.openTaxiModal();
     });
 
-    // Close Taxi Dialog
+    // Taxi Modal schließen
     document.getElementById('taxi-close-btn')?.addEventListener('click', () => {
       document.getElementById('taxi-dialog').close();
     });
   }
 
-  loadTaxiCompanies() {
-    const taxiList = document.getElementById('taxi-list');
-    if (!taxiList) return;
-
-    const taxiCompanies = [
-      { name: 'Taxi Tibljas', phone: '+499281794111' },
-      { name: 'Taxi 8088', phone: '+4992818088' },
-      { name: 'Taxi Frisch', phone: '+4992814866 oder +499281833010' },
-      { name: 'Taxi 3033 Hof', phone: '+4992813033' }
-    ];
-
-    taxiList.innerHTML = '';
-    taxiCompanies.forEach(company => {
-      const item = document.createElement('div');
-      item.className = 'disambiguation-btn';
-      item.innerHTML = `
-        <div>
-          <strong>${company.name}</strong><br>
-          <small>${company.phone}</small>
-        </div>
-        <a href="tel:${company.phone.split(' oder ')[0].replace(/\s/g, '')}" class="btn-gold" style="text-decoration:none; padding:0.3rem 0.6rem; font-size:0.8rem;">Anrufen</a>
-      `;
-      taxiList.appendChild(item);
+  openTaxiModal() {
+    const taxiDialog = document.getElementById('taxi-dialog');
+    const taxiOptionsContainer = document.getElementById('taxi-options-container');
+    
+    // Container leeren
+    taxiOptionsContainer.innerHTML = '';
+    
+    // Taxi-Optionen aus Config generieren
+    this.config.taxi.companies.forEach((company, index) => {
+      const companyDiv = document.createElement('div');
+      companyDiv.className = 'taxi-company';
+      
+      const companyTitle = document.createElement('h4');
+      companyTitle.className = 'taxi-company-name';
+      companyTitle.textContent = company.name;
+      companyDiv.appendChild(companyTitle);
+      
+      if (company.phones && company.phones.length > 1) {
+        // Taxi Frisch: Zwei Nummern untereinander
+        company.phones.forEach(phone => {
+          const phoneBtn = document.createElement('a');
+          phoneBtn.href = `tel:${phone}`;
+          phoneBtn.className = 'btn-gold taxi-phone-btn';
+          phoneBtn.textContent = phone;
+          phoneBtn.style.pointerEvents = 'auto';
+          phoneBtn.style.opacity = '1';
+          companyDiv.appendChild(phoneBtn);
+        });
+      } else {
+        // Einzelne Nummer: Direkter Klick
+        const phone = company.phone || (company.phones && company.phones[0]);
+        const companyBtn = document.createElement('a');
+        companyBtn.href = `tel:${phone}`;
+        companyBtn.className = 'btn-gold taxi-company-btn';
+        companyBtn.innerHTML = `
+          <div class="taxi-company-icon">🚕</div>
+          <div class="taxi-company-text">
+            <div class="taxi-company-name">${company.name}</div>
+            <div class="taxi-company-phone">${phone}</div>
+          </div>
+        `;
+        companyBtn.style.pointerEvents = 'auto';
+        companyBtn.style.opacity = '1';
+        companyDiv.appendChild(companyBtn);
+      }
+      
+      taxiOptionsContainer.appendChild(companyDiv);
     });
+
+    taxiDialog.showModal();
   }
 
   onGuestSelected(guest) {
@@ -298,3 +358,67 @@ class WeddingApp {
       return;
     }
 
+    const hasNotes = guest.notes || guest.dietary || guest.allergies;
+
+    if (!hasNotes) {
+      notesSection.classList.remove('active');
+      return;
+    }
+
+    notesContent.innerHTML = '';
+
+    if (guest.allergies) {
+      notesContent.innerHTML += `<div class="note-item"><span class="note-label">⚠️ Allergien:</span> ${guest.allergies}</div>`;
+    }
+
+    if (guest.dietary) {
+      notesContent.innerHTML += `<div class="note-item"><span class="note-label">🍽️ Essenspräferenzen:</span> ${guest.dietary}</div>`;
+    }
+
+    if (guest.notes) {
+      notesContent.innerHTML += `<div class="note-item"><span class="note-label">📝 Notizen:</span> ${guest.notes}</div>`;
+    }
+
+    notesSection.classList.add('active');
+  }
+
+  focusTable(table) {
+    const container = document.getElementById('map-container');
+    const scale = 1.7;
+
+    const cw = container.clientWidth || container.offsetWidth;
+    const ch = container.clientHeight || container.offsetHeight;
+    
+    const panX = (cw * ((50 - table.x) / 100));
+    const panY = (ch * ((50 - table.y) / 100));
+
+    this.panzoom.zoom(scale, { animate: true });
+    this.panzoom.pan(panX, panY, { animate: true });
+
+    document.getElementById('reset-zoom-btn').classList.remove('hidden');
+
+    const tablesLayer = document.getElementById('tables-layer');
+    tablesLayer.innerHTML = '';
+
+    const highlight = document.createElement('div');
+    highlight.className = 'table-highlight';
+
+    const isBrautTisch = table.id === 'brauttisch' || table.name.toLowerCase().includes('braut');
+    
+    const width = table.width || (isBrautTisch ? 62 : 13.2);
+    const height = table.height || (isBrautTisch ? 16 : 15.3);
+
+    highlight.style.left = `${table.x - width / 2}%`;
+    highlight.style.top = `${table.y - height / 2}%`;
+    highlight.style.width = `${width}%`;
+    highlight.style.height = `${height}%`;
+    highlight.style.borderRadius = isBrautTisch ? '24px' : '8px';
+
+    tablesLayer.appendChild(highlight);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const app = new WeddingApp();
+  app.init();
+});
