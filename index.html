@@ -62,10 +62,12 @@
           <p id="target-seat-info" class="sub-info">Wähle oben deinen Namen aus.</p>
         </div>
         <div class="map-actions-top">
-          <!-- Alle 4 Buttons kompakt auf einer Linie -->
+          <!-- Alle 6 Buttons kompakt auf einer Linie -->
           <button id="reset-zoom-btn" class="btn-speech hidden">🔍 Übersicht</button>
           <button id="toilet-btn" class="btn-creme">🚻 WC</button>
           <button id="speech-btn" class="btn-speech">🔊 Spruch</button>
+          <button id="music-btn" class="btn-creme">🎵 Musik</button>
+          <button id="taxi-btn" class="btn-creme">🚕 Taxi</button>
           <a id="photo-link" href="#" target="_blank" class="btn-gold">📷 Fotos</a>
         </div>
       </div>
@@ -204,6 +206,36 @@
     </div>
   </dialog>
 
+  <dialog id="music-dialog" class="modal">
+    <div class="admin-header">
+      <h3>🎵 Spotify Playlist</h3>
+      <button id="music-close-btn" class="btn-close">&times;</button>
+    </div>
+    <div class="admin-body">
+      <div class="admin-section">
+        <h4>Spotify Playlist URL:</h4>
+        <input type="text" id="spotify-url-input" class="admin-guest-filter" placeholder="https://open.spotify.com/playlist/..." />
+        <button id="save-spotify-btn" class="btn-gold" style="margin-top:0.5rem;">💾 Speichern</button>
+      </div>
+      <div id="spotify-link-section" class="admin-section hidden">
+        <a id="spotify-link" href="#" target="_blank" class="btn-gold" style="display:block; text-align:center; text-decoration:none;">🎵 Zur Playlist</a>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="taxi-dialog" class="modal">
+    <div class="admin-header">
+      <h3>🚕 Taxi bestellen</h3>
+      <button id="taxi-close-btn" class="btn-close">&times;</button>
+    </div>
+    <div class="admin-body">
+      <p style="margin-bottom:1rem;">Wähle ein Taxi-Unternehmen:</p>
+      <div id="taxi-list" class="modal-list">
+        <!-- Taxi-Unternehmen werden dynamisch eingefügt -->
+      </div>
+    </div>
+  </dialog>
+
   <!-- Loading Overlay -->
   <div id="loading-overlay" class="loading-overlay hidden">
     <div class="spinner"></div>
@@ -240,35 +272,3 @@
       });
       const activeContent = document.getElementById('tab-' + tabId);
       if (activeContent) {
-        activeContent.classList.add('active');
-      }
-    }
-
-    // Modal close functionality
-    document.getElementById('legal-close-btn').addEventListener('click', function() {
-      document.getElementById('legal-dialog').close();
-    });
-
-    document.getElementById('legal-understand-btn').addEventListener('click', function() {
-      document.getElementById('legal-dialog').close();
-    });
-
-    // Tab switching in modal
-    document.querySelectorAll('.legal-tab').forEach(tab => {
-      tab.addEventListener('click', function(e) {
-        const tabId = e.target.dataset.tab;
-        switchLegalTab(tabId);
-      });
-    });
-
-    // Close modal when clicking backdrop
-    document.getElementById('legal-dialog').addEventListener('click', function(e) {
-      if (e.target === this) {
-        this.close();
-      }
-    });
-  </script>
-
-  <script type="module" src="js/app.js"></script>
-</body>
-</html>
