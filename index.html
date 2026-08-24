@@ -166,7 +166,6 @@
           <div class="legal-card">
             <h5>KONTAKT PER E-MAIL</h5>
             <p><strong>weimar@gmx.de</strong></p>
-            <p>Für Rückfragen zur Feier & Sitzordnung</p>
           </div>
         </div>
 
@@ -208,32 +207,15 @@
     <div class="spinner"></div>
   </div>
 
-  <!-- Legal Button with Dropdown -->
-  <div class="legal-fab-container">
-    <button id="legal-fab-btn" class="legal-fab" onclick="toggleLegalDropdown()">
-      <span class="legal-icon">🛡️</span>
-      <span class="legal-text">Impressum & DSGVO</span>
-    </button>
-    <div id="legal-dropdown" class="legal-dropdown hidden">
-      <button class="legal-dropdown-item" onclick="openLegalModal('impressum')">Rechtliche Hinweise & Datenschutz</button>
-      <button class="legal-dropdown-item" onclick="openLegalModal('datenschutz')">Datenschutz (DSGVO) + Haftung</button>
-    </div>
-  </div>
+  <!-- Footer -->
+  <footer class="footer">
+    <a href="#" onclick="openLegalModal('impressum'); return false;" class="footer-link">Impressum</a>
+    <span class="footer-separator">|</span>
+    <a href="#" onclick="openLegalModal('datenschutz'); return false;" class="footer-link">Datenschutz</a>
+  </footer>
 
   <script>
-    function toggleLegalDropdown() {
-      const dropdown = document.getElementById('legal-dropdown');
-      if (dropdown) {
-        dropdown.classList.toggle('hidden');
-      }
-    }
-
     function openLegalModal(tabId) {
-      const dropdown = document.getElementById('legal-dropdown');
-      if (dropdown) {
-        dropdown.classList.add('hidden');
-      }
-      
       const dialog = document.getElementById('legal-dialog');
       if (dialog) {
         dialog.showModal();
@@ -259,15 +241,6 @@
         activeContent.classList.add('active');
       }
     }
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-      const fabBtn = document.getElementById('legal-fab-btn');
-      const dropdown = document.getElementById('legal-dropdown');
-      if (fabBtn && dropdown && !fabBtn.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.add('hidden');
-      }
-    });
 
     // Modal close functionality
     document.getElementById('legal-close-btn').addEventListener('click', function() {
