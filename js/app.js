@@ -199,7 +199,6 @@ class WeddingApp {
       const musicDialog = document.getElementById('music-dialog');
       if (musicDialog) {
         musicDialog.showModal();
-        // Load saved Spotify URL
         const savedUrl = localStorage.getItem('wedding_spotify_url');
         if (savedUrl) {
           document.getElementById('spotify-url-input').value = savedUrl;
@@ -215,7 +214,6 @@ class WeddingApp {
       localStorage.setItem('wedding_spotify_url', url);
       document.getElementById('spotify-link').href = url;
       document.getElementById('spotify-link-section').classList.remove('hidden');
-      this.config.photoAlbumUrl = url; // Update config if needed
     });
 
     // Close Music Dialog
@@ -242,7 +240,6 @@ class WeddingApp {
     const taxiList = document.getElementById('taxi-list');
     if (!taxiList) return;
 
-    // Taxi companies from original implementation
     const taxiCompanies = [
       { name: 'Taxi Tibljas', phone: '+499281794111' },
       { name: 'Taxi 8088', phone: '+4992818088' },
@@ -298,3 +295,6 @@ class WeddingApp {
 
     if (!this.config.features.guestNotes) {
       notesSection.classList.remove('active');
+      return;
+    }
+
