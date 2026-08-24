@@ -66,8 +66,8 @@
           <button id="reset-zoom-btn" class="btn-speech hidden">🔍 Übersicht</button>
           <button id="toilet-btn" class="btn-creme">🚻 WC</button>
           <button id="speech-btn" class="btn-speech">🔊 Spruch</button>
-          <button id="music-btn" class="btn-creme" onclick="openMusicDialog()">🎵 Musik</button>
-          <button id="taxi-btn" class="btn-creme" onclick="openTaxiDialog()">🚕 Taxi</button>
+          <button class="btn-creme" onclick="document.getElementById('music-dialog').showModal()">🎵 Musik</button>
+          <button class="btn-creme" onclick="document.getElementById('taxi-dialog').showModal(); loadTaxiCompaniesInline();">🚕 Taxi</button>
           <a id="photo-link" href="https://app.mymillionsnaps.de/f71210da-70bf-4078-ab79-992de5e2316e/pictures" target="_blank" class="btn-gold">📷 Fotos</a>
         </div>
       </div>
@@ -249,26 +249,4 @@
   </footer>
 
   <script>
-    function openLegalModal(tabId) {
-      const dialog = document.getElementById('legal-dialog');
-      if (dialog) {
-        dialog.showModal();
-        switchLegalTab(tabId);
-      }
-    }
-
-    function switchLegalTab(tabId) {
-      // Update tab buttons
-      document.querySelectorAll('.legal-tab').forEach(tab => {
-        tab.classList.remove('active');
-        if (tab.dataset.tab === tabId) {
-          tab.classList.add('active');
-        }
-      });
-
-      // Update tab content
-      document.querySelectorAll('.legal-tab-content').forEach(content => {
-        content.classList.remove('active');
-      });
-      const activeContent = document.getElementById('tab-' + tabId);
-      if (activeContent) {
+    // Einfache d
