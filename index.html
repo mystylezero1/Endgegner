@@ -67,7 +67,7 @@
           <button id="toilet-btn" class="btn-creme">🚻 WC</button>
           <button id="speech-btn" class="btn-speech">🔊 Spruch</button>
           <button class="btn-creme" onclick="document.getElementById('music-dialog').showModal()">🎵 Musik</button>
-          <button class="btn-creme" onclick="document.getElementById('taxi-dialog').showModal(); loadTaxiCompaniesInline();">🚕 Taxi</button>
+          <button class="btn-creme" onclick="openTaxiDialog()">🚕 Taxi</button>
           <a id="photo-link" href="https://app.mymillionsnaps.de/f71210da-70bf-4078-ab79-992de5e2316e/pictures" target="_blank" class="btn-gold">📷 Fotos</a>
         </div>
       </div>
@@ -249,4 +249,192 @@
   </footer>
 
   <script>
-    // Button-Tra
+    // Button-Tracking Konfiguration
+    const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbzXxgDSmjb7xJSr0qxbcuyowZZux18IUiQevZ5MHWgBFYqJ_9yc1ecPOy8Q1WCCeLHY/exec';
+
+    // Geräte-Erkennung
+    function getDeviceInfo() {
+      const ua = navigator.userAgent;
+      let geraet = 'Desktop';
+      let betriebssystem = 'Unbekannt';
+      let browser = 'Unbekannt';
+
+      // Gerätetyp
+      if (/Mobile|Android|iPhone|iPad/i.test(ua)) {
+        geraet = 'Mobile';
+      } else if (/Tablet/i.test(ua)) {
+        geraet = 'Tablet';
+      }
+
+      // Betriebssystem
+      if (/Windows/i.test(ua)) betriebssystem = 'Windows';
+      else if (/Mac/i.test(ua)) betriebssystem = 'Mac';
+      else if (/Linux/i.test(ua)) betriebssystem = 'Linux';
+      else if (/Android/i.test(ua)) betriebssystem = 'Android';
+      else if (/iOS|iPhone|iPad/i.test(ua)) betriebssystem = 'iOS';
+
+      // Browser
+      if (/Chrome/i.test(ua) && !/Edge|OPR/i.test(ua)) browser = 'Chrome';
+      else if (/Safari/i.test(ua) && !/Chrome/i.test(ua)) browser = 'Safari';
+      else if (/Firefox/i.test(ua)) browser = 'Firefox';
+      else if (/Edge/i.test(ua)) browser = 'Edge';
+      else if (/OPR/i.test(ua)) browser = 'Opera';
+
+      return {
+        geraet,
+        betriebssystem,
+        browser,
+        aufloesung: `${window.screen.width}x${window.screen.height}`
+      };
+    }
+
+    // Button-Klick senden
+    function trackButtonClick(buttonName) {
+      const deviceInfo = getDeviceInfo();
+      const now = new Date();
+      
+      const data = {
+        datum: now.toISOString().split('T')[0],
+        uhrzeit: now.toTimeString().split(' ')[0],
+        button: buttonName,
+        geraet: deviceInfo.geraet,
+        betriebssystem: deviceInfo.betriebssystem,
+        browser: deviceInfo.browser,
+        aufloesung: deviceInfo.aufloesung
+      };
+
+      // Senden an Google Apps Script
+      fetch(TRACKING_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      }).catch(error => {
+        console.log('Tracking Fehler (kein Problem):', error);
+      });
+    }
+
+    // Tracking für alle Buttons hinzufügen
+    document.querySelectorAll('button, a').forEach(element => {
+      const originalClick = element.onclick;
+      element.addEventListener('click', function(e) {
+        // Button-Name identifizieren
+        let buttonName = 'Unbekannt';
+        if (this.id) {
+          buttonName = this.id;
+        } else if (this.textContent) {
+          buttonName = this.textContent.trim().substring(0, 20);
+        }
+
+        // Nur tracken wenn es ein relevanter Button ist
+        if (['music-btn', 'taxi-btn', 'photo-link', 'speech-btn', 'toilet-btn', 'reset-zoom-btn'].includes(this.id) ||
+            this.textContent.includes('Musik') || this.textContent.includes('Taxi') || 
+            this.textContent.includes('Fotos') || this.textContent.includes('Spruch') ||
+            this.textContent.includes('WC') || this.textContent.includes('Übersicht')) {
+          trackButtonClick(buttonName);
+        }
+
+        // Original onclick ausführen
+        if (originalClick) {
+          originalClick.call(this, e);
+        }
+      });
+    });
+
+    // Einfache direkte Funktionen
+    function openTaxiDialog() {
+      document.getElementById('taxi-dialog').showModal();
+      setTimeout(loadTaxiCompaniesInline, 100);
+    }
+
+    function loadTaxiCompaniesInline() {
+      const taxiList = document.getElementById('taxi-list');
+      if (!taxiList) return;
+
+      const taxiCompanies = [
+        { name: 'Taxi Tibljas', phone: '+499281794111' },
+        { name: 'Taxi 8088', phone: '+4992818088' },
+        { name: 'Taxi Frisch', phone: '+4992814866 oder +499281833010' },
+        { name: 'Taxi 3033 Hof', phone: '+4992813033' }
+      ];
+
+      taxiList.innerHTML = '';
+      taxiCompanies.forEach(company => {
+        const item = document.createElement('div');
+        item.className = 'disambiguation-btn';
+        item.innerHTML = `
+          <div>
+            <strong>${company.name}</strong><br>
+            <small>${company.phone}</small>
+          </div>
+          <a href="tel:${company.phone.split(' oder ')[0].replace(/\s/g, '')}" class="btn-gold" style="text-decoration:none; padding:0.3rem 0.6rem; font-size:0.8rem;">Anrufen</a>
+        `;
+        taxiList.appendChild(item);
+      });
+    }
+
+    // Modal Schließen-Funktionen
+    document.getElementById('legal-close-btn').onclick = function() {
+      document.getElementById('legal-dialog').close();
+    };
+
+    document.getElementById('legal-understand-btn').onclick = function() {
+      document.getElementById('legal-dialog').close();
+    };
+
+    document.getElementById('music-close-btn').onclick = function() {
+      document.getElementById('music-dialog').close();
+    };
+
+    document.getElementById('taxi-close-btn').onclick = function() {
+      document.getElementById('taxi-dialog').close();
+    };
+
+    // Spotify speichern
+    document.getElementById('save-spotify-btn').onclick = function() {
+      const url = document.getElementById('spotify-url-input').value;
+      localStorage.setItem('wedding_spotify_url', url);
+      document.getElementById('spotify-link').href = url;
+      document.getElementById('spotify-link-section').classList.remove('hidden');
+    };
+
+    // Tab switching
+    document.querySelectorAll('.legal-tab').forEach(tab => {
+      tab.onclick = function(e) {
+        const tabId = e.target.dataset.tab;
+        document.querySelectorAll('.legal-tab').forEach(t => t.classList.remove('active'));
+        e.target.classList.add('active');
+        document.querySelectorAll('.legal-tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+      };
+    });
+
+    // Backdrop clicks
+    document.getElementById('legal-dialog').onclick = function(e) {
+      if (e.target === this) this.close();
+    };
+
+    document.getElementById('music-dialog').onclick = function(e) {
+      if (e.target === this) this.close();
+    };
+
+    document.getElementById('taxi-dialog').onclick = function(e) {
+      if (e.target === this) this.close();
+    };
+
+    // Legal Modal öffnen
+    function openLegalModal(tabId) {
+      const dialog = document.getElementById('legal-dialog');
+      dialog.showModal();
+      document.querySelectorAll('.legal-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector('.legal-tab[data-tab="' + tabId + '"]').classList.add('active');
+      document.querySelectorAll('.legal-tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+  </script>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
