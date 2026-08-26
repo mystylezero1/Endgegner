@@ -384,10 +384,10 @@
       if (!taxiList) return;
 
       const taxiCompanies = [
-        { name: '🚕 Taxi Tibljas', phone: '+499281794111' },
-        { name: '🚕 Taxi 8088', phone: '+4992818088' },
+        { name: 'Taxi Tibljas', phone: '+499281794111' },
+        { name: 'Taxi 8088', phone: '+4992818088' },
         { name: 'Taxi Frisch', phones: ['+4992814866', '+499281833010'] },
-        { name: '🚕 Taxi 3033 Hof', phone: '+4992813033' }
+        { name: 'Taxi 3033 Hof', phone: '+4992813033' }
       ];
 
       taxiList.innerHTML = '';
@@ -405,8 +405,8 @@
           `;
           buttonHTML = `
             <div style="display:flex; gap:0.3rem;">
-              <a href="tel:${company.phones[0].replace(/\s/g, '')}" class="btn-gold" style="text-decoration:none; padding:0.3rem 0.6rem; font-size:0.8rem;">Anrufen 1</a>
-              <a href="tel:${company.phones[1].replace(/\s/g, '')}" class="btn-gold" style="text-decoration:none; padding:0.3rem 0.6rem; font-size:0.8rem;">Anrufen 2</a>
+              <a href="tel:${company.phones[0].replace(/\s/g, '')}" class="btn-gold" style="text-decoration:none; padding:0.3rem 0.6rem; font-size:0.8rem;">Anrufen</a>
+              <a href="tel:${company.phones[1].replace(/\s/g, '')}" class="btn-gold" style="text-decoration:none; padding:0.3rem 0.6rem; font-size:0.8rem;">Anrufen</a>
             </div>
           `;
         } else {
