@@ -66,7 +66,7 @@
           <button id="reset-zoom-btn" class="btn-speech hidden">🔍 Übersicht</button>
           <button id="toilet-btn" class="btn-creme" onclick="toggleToiletView()">🚻 WC</button>
           <button id="speech-btn" class="btn-speech" onclick="showSpeech()">🔊 Spruch</button>
-          <a id="music-link" href="#" target="_blank" class="btn-creme">🎵 Musik</a>
+          <a id="music-link" href="https://open.spotify.com/" target="_blank" class="btn-creme">🎵 Musik</a>
           <button id="taxi-btn" class="btn-creme" onclick="openTaxiDialog()">🚕 Taxi</button>
           <a id="photo-link" href="https://app.mymillionsnaps.de/f71210da-70bf-4078-ab79-992de5e2316e/pictures" target="_blank" class="btn-gold">📷 Fotos</a>
         </div>
@@ -446,3 +446,54 @@
     document.getElementById('music-close-btn').onclick = function() {
       document.getElementById('music-dialog').close();
     };
+
+    document.getElementById('taxi-close-btn').onclick = function() {
+      document.getElementById('taxi-dialog').close();
+    };
+
+    // Spotify speichern
+    document.getElementById('save-spotify-btn').onclick = function() {
+      const url = document.getElementById('spotify-url-input').value;
+      localStorage.setItem('wedding_spotify_url', url);
+      document.getElementById('spotify-link').href = url;
+      document.getElementById('spotify-link-section').classList.remove('hidden');
+    };
+
+    // Tab switching
+    document.querySelectorAll('.legal-tab').forEach(tab => {
+      tab.onclick = function(e) {
+        const tabId = e.target.dataset.tab;
+        document.querySelectorAll('.legal-tab').forEach(t => t.classList.remove('active'));
+        e.target.classList.add('active');
+        document.querySelectorAll('.legal-tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+      };
+    });
+
+    // Backdrop clicks
+    document.getElementById('legal-dialog').onclick = function(e) {
+      if (e.target === this) this.close();
+    };
+
+    document.getElementById('music-dialog').onclick = function(e) {
+      if (e.target === this) this.close();
+    };
+
+    document.getElementById('taxi-dialog').onclick = function(e) {
+      if (e.target === this) this.close();
+    };
+
+    // Legal Modal öffnen
+    function openLegalModal(tabId) {
+      const dialog = document.getElementById('legal-dialog');
+      dialog.showModal();
+      document.querySelectorAll('.legal-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector('.legal-tab[data-tab="' + tabId + '"]').classList.add('active');
+      document.querySelectorAll('.legal-tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+  </script>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
