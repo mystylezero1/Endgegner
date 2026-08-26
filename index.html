@@ -318,7 +318,6 @@
 
     // Tracking für alle Buttons hinzufügen
     document.querySelectorAll('button, a').forEach(element => {
-      const originalClick = element.onclick;
       element.addEventListener('click', function(e) {
         // Button-Name identifizieren
         let buttonName = 'Unbekannt';
@@ -329,16 +328,11 @@
         }
 
         // Nur tracken wenn es ein relevanter Button ist
-        if (['music-btn', 'taxi-btn', 'photo-link', 'speech-btn', 'toilet-btn', 'reset-zoom-btn'].includes(this.id) ||
+        if (['music-link', 'taxi-btn', 'photo-link', 'speech-btn', 'toilet-btn', 'reset-zoom-btn'].includes(this.id) ||
             this.textContent.includes('Musik') || this.textContent.includes('Taxi') || 
             this.textContent.includes('Fotos') || this.textContent.includes('Spruch') ||
             this.textContent.includes('WC') || this.textContent.includes('Übersicht')) {
           trackButtonClick(buttonName);
-        }
-
-        // Original onclick ausführen
-        if (originalClick) {
-          originalClick.call(this, e);
         }
       });
     });
